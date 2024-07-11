@@ -223,6 +223,29 @@ box-shadow: rgba(255,255,255, 0.75) 1.5em 0 0 0, rgba(255,255,255, 0.75) 1.1em 1
 }
 	</style>
 
+  <script>  // Javascript to monitor the model radio button and clear/disable the negative reply textbox if XL Tubo is selected
+    function toggleNegPrompt() {
+      const sdxlTurbo = document.getElementById('sdxlturbo');
+      const negPrompt = document.getElementById('neg-prompt');
+
+      if (sdxlTurbo.checked) {
+        negPrompt.value = ''; // Clear the negative prompt text area if we use the Turbo model
+        negPrompt.disabled = true; // disable negative prompt entry if we use the Turbo model
+      } else {
+        negPrompt.disabled = false;
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+      toggleNegPrompt(); // Initialize the state on page load
+
+      const radioButtons = document.querySelectorAll('input[name="sdxl"]');
+      radioButtons.forEach(radio => {
+        radio.addEventListener('change', toggleNegPrompt);
+      });
+    });
+  </script>
+
 </head>
 <body class="g-sidenav-show  bg-gray-100">
   
@@ -269,25 +292,38 @@ box-shadow: rgba(255,255,255, 0.75) 1.5em 0 0 0, rgba(255,255,255, 0.75) 1.1em 1
 					
 					<input type="hidden" id="action" value="" name="action">
 					
-					<div class="mb-3">Name of the project
+					<div class="mb-3">Name of the project:
                       <input  name="project" id="project_name"  type="text" class="form-control" placeholder="Name of the project" aria-label="Password" aria-describedby="password-addon" value="<?= $proj->name; ?>">
                     </div>
 										
-					<div class="mb-2">Positive Prompt.
+					<div class="mb-2">Positive Prompt:
                       <textarea name="pos-prompt" id="pos-prompt" class="form-control" aria-label="Positive Prompt" aria-describedby="email-addon" style="height: 64px; max-height: 200px; min-height: 64px;"><?= $proj->posprompt; ?></textarea>
                     </div>
 					
-					<div class="mb-2">Negative Prompt.
-                      <textarea name="neg-prompt" class="form-control" aria-label="Negative Prompt" aria-describedby="email-addon" style="height: 64px; max-height: 200px; min-height: 64px;"><?= $proj->negprompt; ?></textarea>
+					<div class="mb-2">Negative Prompt:
+                      <textarea name="neg-prompt" class="form-control" aria-label="Negative Prompt" aria-describedby="email-addon" id="neg-prompt" style="height: 64px; max-height: 200px; min-height: 64px;"><?= $proj->negprompt; ?></textarea>
                     </div>				
-					
-					<div class="form-check form-switch ps-0">
-                      <input class="form-check-input ms-auto" type="checkbox" name="sdxl" id="flexSwitchCheckDefault" <?php if ($proj->sdxl == 1){ print "checked"; } ?>>
-                      <label class="form-check-label text-body ms-3 text-truncate w-80 mb-0" for="flexSwitchCheckDefault">Use Stable Diffusion XL1.0</label>
-                    </div>
-					
-					
-					<div class="mb-3">Steps
+
+                    SD Model:
+          <div class="form-check">
+                  <input class="form-check-input" type="radio" name="sdxl" id="sd15" value="0" <?php if ($proj->sdxl == 0) { echo 'checked'; } ?>>
+                  <label class="form-check-label" for="sd15">
+                  Stable Diffusion 1.5</label>
+          </div>
+
+          <div class="form-check">
+                  <input class="form-check-input" type="radio" name="sdxl" id="sdxl10" value="1" <?php if ($proj->sdxl == 1) { echo 'checked'; } ?>>
+                  <label class="form-check-label" for="sdxl10">
+                  Stable Diffusion XL 1.0</label>
+          </div>
+
+          <div class="form-check">
+                  <input class="form-check-input" type="radio" name="sdxl" id="sdxlturbo" value="2" <?php if ($proj->sdxl == 2) { echo 'checked'; } ?>>
+                  <label class="form-check-label" for="sdxlturbo">
+                  Stable Diffusion XL Turbo 1.0</label>
+          </div>
+
+					<div class="mb-3">Steps:
                       <input name="steps" type="text" class="form-control" placeholder="10" aria-label="Password" aria-describedby="password-addon" style="width: 60px;" value="<?php if ($proj->steps != "") { print $proj->steps; } else { print "10"; } ?>" onChange="CheckNumber(this);">
                     </div>
 					
@@ -307,7 +343,7 @@ box-shadow: rgba(255,255,255, 0.75) 1.5em 0 0 0, rgba(255,255,255, 0.75) 1.1em 1
                     
                     <div class="position-relative d-flex align-items-center justify-content-center h-100" style="vertical-align: top; padding-top: 8px; padding-bottom: 8px;">
 					
-                      <img class="w-100 position-relative z-index-2" id="generated_photo" src="<?php if (strlen($obj->picture) > 4 and file_exists($obj->picture)) { print $obj->picture; } else { print "img/illustrations/rocket-white.png"; } ?>" alt="processing" style="max-width: 430px; max-height: 400px; margin-top: 18px; margin-bottom: 18px;">
+                      <img class="w-100 position-relative z-index-2" id="generated_photo" src="<?php if (strlen($proj->picture) > 4 and file_exists($proj->picture)) { print $proj->picture; } else { print "img/illustrations/rocket-white.png"; } ?>" alt="processing" style="max-width: 430px; max-height: 400px; margin-top: 18px; margin-bottom: 18px;">
 					  
                     </div>
 					
@@ -457,6 +493,8 @@ box-shadow: rgba(255,255,255, 0.75) 1.5em 0 0 0, rgba(255,255,255, 0.75) 1.1em 1
 	}
 	
 	function CheckNumber(obj){
+    var sdxlValue = <?= $proj->sdxl; ?>;
+
 		num = parseInt(obj.value);
 			
 		if (isNaN(num)){
@@ -469,7 +507,7 @@ box-shadow: rgba(255,255,255, 0.75) 1.5em 0 0 0, rgba(255,255,255, 0.75) 1.1em 1
 			obj.style.background = "#FFFFFF";
 		}
 		
-		if (num < 3){
+		if (sdxlValue !== 2 && num < 3){
 			obj.style.background = "#FF6868";
 		}
 		else if (num > 100){

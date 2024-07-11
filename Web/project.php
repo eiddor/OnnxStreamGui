@@ -15,13 +15,13 @@ class Project{
 ", file_get_contents("project.txt"));
 		
 		if (strlen($data[0]) > 2){
-			$this->name = $data[0].trim();
-			$this->posprompt = $data[1].trim();
-			$this->negprompt = $data[2].trim();
-			$this->steps = $data[3].trim();
-			$this->seed = $data[4].trim();
-			$this->picture = $data[5].trim();
-			$this->sdxl = intval($data[6].trim());
+			$this->name = trim($data[0]);
+			$this->posprompt = trim($data[1]);
+			$this->negprompt = trim($data[2]);
+			$this->steps = trim($data[3]);
+			$this->seed = trim($data[4]);
+			$this->picture = trim($data[5]);
+			$this->sdxl = intval(trim($data[6]));
 		}
 		else{
 			$this->name = "";
@@ -75,5 +75,3 @@ class Project{
 		return true;
 	}
 }
-
-?>

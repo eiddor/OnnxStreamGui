@@ -7,6 +7,8 @@ $proj = new Project();
 
 $proj->load();
 
+$negPrompt = isset($_POST['neg-prompt']) ? $_POST['neg-prompt'] : '';
+
 // Check if 'sdxl' exists in the POST request, otherwise set a default value
 $proj->sdxl = isset($_POST['sdxl']) ? $_POST['sdxl'] : 0;
 
